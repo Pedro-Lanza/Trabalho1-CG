@@ -17,7 +17,7 @@ class Color{
 }
 
 class Shape2d{
-    constructor (color, vertexes = null){
+    constructor (color, vertexes = []){
         this.color = color;
         this.vertexes = vertexes;
     }
@@ -63,6 +63,7 @@ class Circle extends Shape2d{
             coords[3*i] = p[0];
             coords[3*i+1] = p[1];
             coords[3*i+2] = 0.0;
+            this.vertexes.push(new Point2d(p[0], p[1], this.color));
 
             colors[3*i] = this.color.r;
             colors[3*i+1] = this.color.g;
@@ -181,8 +182,9 @@ class Elipse extends Shape2d{
     }
 }
 
-class Triangle{
+class Triangle extends Shape2d{
     constructor (p0,p1,p2,c){
+        super(c);
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
@@ -217,8 +219,9 @@ class TriangleList{
     }
 }
 
-class Rectangle{
+class Rectangle extends Shape2d{
     constructor(p0, h, w, c){
+        super(c)
         this.p0 = p0;
         this.height = h;
         this.width = w;
@@ -226,8 +229,9 @@ class Rectangle{
     }
 }
 
-class Line{
+class Line extends Shape2d{
     constructor(p0, p1, c){
+        super(c);
         this.p0 = p0;
         this.p1 = p1;
         this.color = c;
