@@ -117,20 +117,20 @@ class WebGLModel{
     }
 
 
-    rotationMatrix(angle = 0){
+    rotationMatrix(angle = 0, xpos=0, ypos=0){
         angle = angle * (Math.PI/180);
 
         return [ Math.cos(angle), Math.sin(angle), 0.0, 0.0,
                 -Math.sin(angle), Math.cos(angle), 0.0, 0.0,
                 0.0,              0.0,             1.0, 0.0,
-                0.0,              0.0,             0.0, 1.0
+                xpos,              ypos,             0.0, 1.0
                ];
       }
 
-      setRotation(angle = 0, vertexes = []){
+      setRotation(angle = 0, vertexes = [],xpos=0, ypos=0){
         const uniformShaderVariablesValues = {
           "uVertexPointSize":["1f",16.0],
-          "uModelViewMatrix":["mat4",false,this.rotationMatrix(angle)]
+          "uModelViewMatrix":["mat4",false,this.rotationMatrix(angle,xpos,ypos)]
         };
 
         let x = 0, y = 0;
@@ -155,9 +155,9 @@ class WebGLModel{
 
 
     /* Desenha o model */
-    draw(angle = 0){
+    draw(angle = 0, x=0, y=0){
 
-        this.setRotation(angle, this.vertexes);
+        this.setRotation(angle, this.vertexes,x,y);
  
         // Bind VAO
         this.gl.bindVertexArray(this.VAO);

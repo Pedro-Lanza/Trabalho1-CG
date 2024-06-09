@@ -27,6 +27,8 @@
     uniform float uVertexPointSize;
     uniform mat4 uModelViewMatrix;
     uniform vec3 aShapeCenter;
+    uniform mat4 uPositionMatrix;
+    uniform float uTime;
     smooth out vec4 vColor;
 
     void main(void) {
@@ -68,6 +70,7 @@
       }
 
       create(){
+        this.startTime = Date.now();
         
         // Cria um program
         this.program = this.createProgram("vertex-shader","fragment-shader");
@@ -169,6 +172,8 @@
       }
 
       draw() {
+        const currentTime = Date.now();
+        const elapsedTime = (currentTime - this.startTime) / 1000.0;
 
         const angle = (10.0*Math.PI)/180.0;
         const tx = 0.75;
@@ -179,12 +184,10 @@
         //                                       0.0,             0.0, 1.0, 0.0,
         //                                        tx,               ty, 0.0, 1.0];
 
-        this.i += 1;
-
-        const modelViewMatrix = [ 1.0, 0.0, 0.0, 0.0,
-                                 0.0, 1.0, 0.0, 0.0,
-                                0.0, 0.0, 1.0, 0.0,
-                                tx, ty, 0.0, 1.0];
+        // const modelViewMatrix = [ 1.0, 0.0, 0.0, 0.0,
+        //                          0.0, 1.0, 0.0, 0.0,
+        //                         0.0, 0.0, 1.0, 0.0,
+        //                         tx, ty, 0.0, 1.0];
 
         const uniformShaderVariablesValues = {"uVertexPointSize":["1f",16.0],"uModelViewMatrix":["mat4",false,identMatrix4]};
         // const uniformShaderVariablesValues2 = {"uVertexPointSize":["1f",16.0],"uModelViewMatrix":["mat4",false,modelViewMatrix]};
@@ -198,7 +201,7 @@
 
         // this.setProgramUniformShaderVariablesValues(this.program,uniformShaderVariablesValues2);
 
-        this.polygonModel.draw(180);
+        this.polygonModel.draw(180 * elapsedTime, Math.sin(elapsedTime), Math.cos(elapsedTime));
         this.rectangleModel.draw(45);
         this.lineModel.draw();
         // this.elipseModel.draw();
