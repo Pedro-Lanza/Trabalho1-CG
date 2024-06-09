@@ -280,6 +280,7 @@
         this.angel = null;
         this.leftWing = null;
         this.rightWing = null;
+        this.startTime = null;
     }
 
     create() {
@@ -301,15 +302,26 @@
     }
 
     draw() {
-        const identMatrix4 = new Float32Array([
+        if (this.startTime === null) {
+            this.startTime = Date.now();
+        }
+
+        const currentTime = Date.now();
+        const elapsedTime = (currentTime - this.startTime) / 1000.0;
+        const bounceHeight = 0.1;
+        const bounceSpeed = 2.0;
+        const offsetY = bounceHeight * Math.sin(bounceSpeed * elapsedTime);
+
+        const translationMatrix = new Float32Array([
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
+            0.0, offsetY, 0.0, 1.0
         ]);
-        const uniformShaderVariablesValues = { 
-            "uVertexPointSize": ["1f", 16.0], 
-            "uModelViewMatrix": ["mat4", false, identMatrix4] 
+
+        const uniformShaderVariablesValues = {
+            "uVertexPointSize": ["1f", 16.0],
+            "uModelViewMatrix": ["mat4", false, translationMatrix]
         };
 
         this.setProgramUniformShaderVariablesValues(this.program, uniformShaderVariablesValues);
