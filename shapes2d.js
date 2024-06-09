@@ -182,9 +182,8 @@ class Elipse extends Shape2d{
     }
 }
 
-class Triangle extends Shape2d{
+class Triangle{
     constructor (p0,p1,p2,c){
-        super(c);
         this.p0 = p0;
         this.p1 = p1;
         this.p2 = p2;
@@ -219,9 +218,8 @@ class TriangleList{
     }
 }
 
-class Rectangle extends Shape2d{
+class Rectangle{
     constructor(p0, h, w, c){
-        super(c)
         this.p0 = p0;
         this.height = h;
         this.width = w;
@@ -229,9 +227,8 @@ class Rectangle extends Shape2d{
     }
 }
 
-class Line extends Shape2d{
+class Line{
     constructor(p0, p1, c){
-        super(c);
         this.p0 = p0;
         this.p1 = p1;
         this.color = c;

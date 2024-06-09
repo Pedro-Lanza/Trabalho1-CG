@@ -155,50 +155,54 @@ class WebGLTriangleList extends TriangleList{
     }
 }
 
-class WebGLRectangle extends Rectangle{
-    constructor(gl,program,p0,height,width,c,interpolation){
-        super(p0,height,width,c);
+class WebGLRectangle extends Rectangle {
+    constructor(gl, program, p0, height, width, c, interpolation) {
+        super(p0, height, width, c);
         this.gl = gl;
         this.program = program;
         this.interpolation = interpolation;
-        this.vertexes = [p0,
-            new Point2d(this.p0.x,this.p0.y-this.height,this.color),
-            new Point2d(this.p0.x+this.width,this.p0.y-this.height,this.color),
-            new Point2d(this.p0.x+this.width,this.p0.y,this.color)
+        this.vertexes = [
+            p0,
+            new Point2d(this.p0.x, this.p0.y - this.height, this.color),
+            new Point2d(this.p0.x + this.width, this.p0.y - this.height, this.color),
+            new Point2d(this.p0.x + this.width, this.p0.y, this.color)
         ];
     }
 
-    getWebGLModel(attribShaderVariables = null,uniformShaderVariables = null){
-        var coords = [this.p0.x,this.p0.y,0,
-            this.p0.x,this.p0.y-this.height,0,
-            this.p0.x+this.width,this.p0.y-this.height,0,
-            this.p0.x+this.width,this.p0.y,0];
+    getWebGLModel(attribShaderVariables = null, uniformShaderVariables = null) {
+        var coords = [
+            this.p0.x, this.p0.y, 0,
+            this.p0.x, this.p0.y - this.height, 0,
+            this.p0.x + this.width, this.p0.y - this.height, 0,
+            this.p0.x + this.width, this.p0.y, 0
+        ];
 
-        var indices = [0,1,2,2,0,3]; 
+        var indices = [0, 1, 2, 2, 0, 3];
         var colors;
 
-        if (this.interpolation == true)
-        {
-            colors = [this.p0.color.r,this.p0.color.g,this.p0.color.b,
-                        this.p0.color.r,this.p0.color.g,this.p0.color.b,
-                        this.p0.color.r,this.p0.color.g,this.p0.color.b,
-                        this.p0.color.r,this.p3.color.g,this.p0.color.b];
-        }
-        else{
-            colors = [this.color.r,this.color.g,this.color.b,
-                        this.color.r,this.color.g,this.color.b,
-                        this.color.r,this.color.g,this.color.b,
-                        this.color.r,this.color.g,this.color.b];
+        if (this.interpolation == true) {
+            colors = [
+                this.p0.color.r, this.p0.color.g, this.p0.color.b,
+                this.p0.color.r, this.p0.color.g, this.p0.color.b,
+                this.p0.color.r, this.p0.color.g, this.p0.color.b,
+                this.p0.color.r, this.p3.color.g, this.p0.color.b
+            ];
+        } else {
+            colors = [
+                this.color.r, this.color.g, this.color.b,
+                this.color.r, this.color.g, this.color.b,
+                this.color.r, this.color.g, this.color.b,
+                this.color.r, this.color.g, this.color.b
+            ];
         }
 
-        const webGLRectangleModel = new WebGLModel(
-            this.gl, this.program, 3, this.gl.TRIANGLES, coords, indices, colors, null, null, null, this.vertexes
-        );
-        webGLRectangleModel.set(attribShaderVariables,uniformShaderVariables);
+        const webGLRectangleModel = new WebGLModel(this.gl, this.program, 3, this.gl.TRIANGLES, coords, indices, colors, null, null, null, this.vertexes);
+        webGLRectangleModel.set(attribShaderVariables, uniformShaderVariables);
 
         return webGLRectangleModel;
     }
 }
+
 
 class WebGLLine extends Line{
     constructor(gl,program,p0,p1,c,interpolation){
@@ -352,38 +356,45 @@ class WebGLPolygon extends Polygon{
 }
 
 
-class WebGLCircle extends Circle{
-    constructor (gl,program,cx,cy,radius,color,numSubdiv,filled,interpolation){
-        super(cx,cy,radius,color,numSubdiv);
+class WebGLCircle extends Circle {
+    constructor(gl, program, cx, cy, radius, color, numSubdiv, filled, interpolation) {
+        super(cx, cy, radius, color, numSubdiv);
         this.gl = gl;
         this.program = program;
         this.interpolation = interpolation;
         this.filled = filled;
-    
+        this.vertexes = [];
     }
 
-    getWebGLModel(attribShaderVariables = null,uniformShaderVariables = null){
-        
+    getWebGLModel(attribShaderVariables = null, uniformShaderVariables = null) {
         var coords = [];
         var indices = [];
         var colors = [];
         var primitiveType;
 
-        if (this.filled == true){
-            this.discreticizeFilled(this.numSubdiv,coords,indices,colors);
+        if (this.filled == true) {
+            this.discreticizeFilled(this.numSubdiv, coords, indices, colors);
             primitiveType = this.gl.TRIANGLES;
-        }
-        else{
-            this.discreticize(this.numSubdiv,coords,indices,colors);
+        } else {
+            this.discreticize(this.numSubdiv, coords, indices, colors);
             primitiveType = this.gl.LINE_LOOP;
         }
- 
-        const webGLCircleModel = new WebGLModel(this.gl,this.program,2,primitiveType,coords,indices,colors,null,null,null);
-        webGLCircleModel.set(attribShaderVariables,uniformShaderVariables);
+
+        // Initialize vertexes
+        for (let i = 0; i < this.numSubdiv; i++) {
+            const ang = 2 * Math.PI * i / this.numSubdiv;
+            const x = this.radius * Math.cos(ang) + this.cx;
+            const y = this.radius * Math.sin(ang) + this.cy;
+            this.vertexes.push(new Point2d(x, y, this.color));
+        }
+
+        const webGLCircleModel = new WebGLModel(this.gl, this.program, 2, primitiveType, coords, indices, colors, null, null, null, this.vertexes);
+        webGLCircleModel.set(attribShaderVariables, uniformShaderVariables);
 
         return webGLCircleModel;
     }
 }
+
 
 class WebGLElipse extends Elipse{
     constructor (gl,program,cx,cy,hRadius,vRadius,color,numSubdiv,filled,interpolation){
@@ -492,3 +503,134 @@ class WebGLBSpline extends BSpline{
         return [webGLBSplineControlPointsModel,webGLBSplineControlPointsEdgesModel,webGLBSplineModel];
     }
 }
+
+class WebGLAngeling {
+    constructor(gl, program) {
+        this.gl = gl;
+        this.program = program;
+        this.shapes = [];
+        this.initShapes();
+    }
+
+    initShapes() {
+        const bodyColor = new Color(1.0, 0.6, 0.6, 1.0); // Old shade of pink
+        const eyeColor = new Color(0.0, 0.0, 0.0, 1.0); // Eye color (black)
+        const haloColor = new Color(1.0, 1.0, 0.0, 1.0); // Halo color (yellow)
+        const mouthColor = new Color(0.0, 0.0, 0.0, 1.0); // Mouth color (black)
+
+        // Body (circle)
+        const body = new WebGLCircle(this.gl, this.program, 0.0, 0.0, 0.3, bodyColor, 32, true);
+        this.shapes.push(body);
+
+        // Eyes (circles)
+        const leftEye = new WebGLCircle(this.gl, this.program, -0.1, 0.1, 0.05, eyeColor, 32, true);
+        const rightEye = new WebGLCircle(this.gl, this.program, 0.1, 0.1, 0.05, eyeColor, 32, true);
+        this.shapes.push(leftEye, rightEye);
+
+        // Halo (circle)
+        const halo = new WebGLCircle(this.gl, this.program, 0.0, 0.35, 0.2, haloColor, 32, false);
+        this.shapes.push(halo);
+
+        // Mouth (lower halves of two circles, smaller and higher)
+        const mouthLeftArc = new WebGLArc(this.gl, this.program, -0.07, -0.05, 0.07, Math.PI, 2 * Math.PI, mouthColor, 32);
+        const mouthRightArc = new WebGLArc(this.gl, this.program, 0.07, -0.05, 0.07, Math.PI, 2 * Math.PI, mouthColor, 32);
+        this.shapes.push(mouthLeftArc, mouthRightArc);
+    }
+
+    getWebGLModel() {
+        return this.shapes.map(shape => shape.getWebGLModel());
+    }
+}
+
+class WebGLArc extends Shape2d {
+    constructor(gl, program, cx, cy, radius, startAngle, endAngle, color, numSubdiv) {
+        super(color);
+        this.gl = gl;
+        this.program = program;
+        this.cx = cx;
+        this.cy = cy;
+        this.radius = radius;
+        this.startAngle = startAngle;
+        this.endAngle = endAngle;
+        this.numSubdiv = numSubdiv;
+        this.initModel();
+    }
+
+    evaluate(ang) {
+        const x = this.radius * Math.cos(ang) + this.cx;
+        const y = this.radius * Math.sin(ang) + this.cy;
+        return [x, y];
+    }
+
+    initModel() {
+        const delta = (this.endAngle - this.startAngle) / this.numSubdiv;
+        const coords = [];
+        const indices = [];
+        const colors = [];
+
+        for (let i = 0; i <= this.numSubdiv; i++) {
+            const ang = this.startAngle + i * delta;
+            const [x, y] = this.evaluate(ang);
+            coords.push(x, y, 0.0);
+            colors.push(this.color.r, this.color.g, this.color.b);
+            indices.push(i);
+        }
+
+        this.model = new WebGLModel(this.gl, this.program, 3, this.gl.LINE_STRIP, coords, indices, colors);
+        this.model.initBuffers();
+    }
+
+    getWebGLModel() {
+        return this.model;
+    }
+
+    draw() {
+        this.model.draw();
+    }
+}
+
+
+class WebGLAngelWing {
+    constructor(gl, program, offsetX, offsetY, mirror = false) {
+        this.gl = gl;
+        this.program = program;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.mirror = mirror;
+        this.shapes = [];
+        this.initShapes();
+    }
+
+    initShapes() {
+        const c0 = new Color(1.0, 0.9, 0.8); // Light color for the wing
+
+        // Main wing structure
+        const mainEllipses = [
+            new WebGLElipse(this.gl, this.program, this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.5, 0.15, 0.3, c0, 32, true),
+            new WebGLElipse(this.gl, this.program, this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.3, 0.12, 0.25, c0, 32, true),
+            new WebGLElipse(this.gl, this.program, this.offsetX, this.offsetY + 0.1, 0.1, 0.2, c0, 32, true)
+        ];
+
+        // Feathers
+        const featherCircles = [
+            new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.3 : this.offsetX - 0.3, this.offsetY + 0.4, 0.05, c0, 32, true),
+            new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.3, 0.04, c0, 32, true),
+            new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.2, 0.03, c0, 32, true),
+            new WebGLCircle(this.gl, this.program, this.offsetX, this.offsetY, 0.02, c0, 32, true)
+        ];
+
+        // Connectors (lines)
+        const connectors = [
+            new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.3 : this.offsetX - 0.3, this.offsetY + 0.4, c0), new Point2d(this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.5, c0), c0, false),
+            new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.3, c0), new Point2d(this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.4, c0), c0, false),
+            new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.2, c0), new Point2d(this.offsetX, this.offsetY + 0.3, c0), c0, false),
+        ];
+
+        this.shapes.push(...mainEllipses, ...featherCircles, ...connectors);
+    }
+
+    getWebGLModel() {
+        return this.shapes.map(shape => shape.getWebGLModel());
+    }
+}
+

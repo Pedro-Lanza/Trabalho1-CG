@@ -20,65 +20,61 @@ class WebGLMainApp{
     /* Obtem um shader em funcao do id no documento html */
     getShader(id) {
         const script = document.getElementById(id);
+        if (!script) {
+            console.error(`Shader script with ID '${id}' not found`);
+            return null;
+        }
         const shaderString = script.text.trim();
-
-        var shader;
+        let shader;
         if (script.type === 'x-shader/x-vertex') {
-          shader = this.gl.createShader(this.gl.VERTEX_SHADER);
+            shader = this.gl.createShader(this.gl.VERTEX_SHADER);
+        } else if (script.type === 'x-shader/x-fragment') {
+            shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+        } else {
+            return null;
         }
-        else if (script.type === 'x-shader/x-fragment') {
-          shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
-        }
-        else {
-          return null;
-        }
-
         this.gl.shaderSource(shader, shaderString);
         this.gl.compileShader(shader);
-
         if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-          console.error(this.gl.getShaderInfoLog(shader));
-          return null;
+            console.error(this.gl.getShaderInfoLog(shader));
+            return null;
         }
-
         return shader;
     }
 
     /* Cria um programa. Devem ser passados os nomes dos scripts correspondentes aos shaders */
-    createProgram(vertexShaderName,fragmentShaderName) {
+    createProgram(vertexShaderName, fragmentShaderName) {
         const vertexShader = this.getShader(vertexShaderName);
         const fragmentShader = this.getShader(fragmentShaderName);
-
+        if (!vertexShader || !fragmentShader) {
+            console.error('Could not create shaders');
+            return null;
+        }
         this.program = this.gl.createProgram();
         this.gl.attachShader(this.program, vertexShader);
         this.gl.attachShader(this.program, fragmentShader);
         this.gl.linkProgram(this.program);
-
         if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
-          console.error('Could not initialize shaders');
+            console.error('Could not initialize shaders');
         }
-
         this.gl.useProgram(this.program);
-
         return this.program;
     }
 
     /* Armazena na variavel program a localizacao das variaveis de tipo attribute do shader */
-    setProgramAttribShaderVariablesLocation(program,variables){
-        if (variables == null) return;
-        var i;
-        for (i=0;i<variables.length;i++){
-            program[variables[i]] = this.gl.getAttribLocation(program,variables[i]);
-        }
+    setProgramAttribShaderVariablesLocation(program, variables) {
+        if (!variables) return;
+        variables.forEach(varName => {
+            program[varName] = this.gl.getAttribLocation(program, varName);
+        });
     }
 
     /* Armazena na variavel program a localizacao das variaveis de tipo uniform do shader */
-    setProgramUniformShaderVariablesLocation(program,variables){
-        if (variables == null) return;
-        var i;
-        for (i=0;i<variables.length;i++){
-            program[variables[i]] = this.gl.getUniformLocation(program,variables[i]);
-        }
+    setProgramUniformShaderVariablesLocation(program, variables) {
+        if (!variables) return;
+        variables.forEach(varName => {
+            program[varName] = this.gl.getUniformLocation(program, varName);
+        });
     }
 
     /* Atribui valores as variaveis de tipo uniform no program                                                          */

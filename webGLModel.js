@@ -28,39 +28,43 @@ class WebGLModel{
     }
 
     /* Inicializa of buffers. Somente foram implementados os buffers de coordenadas, cores e indices */
-    initBuffers(){
+    initBuffers() {
         // Create VAO
         this.VAO = this.gl.createVertexArray();
-
+    
         // Bind VAO
         this.gl.bindVertexArray(this.VAO);
-
-        //Create all VBOs
-        this.coordsVBO = this.gl.createBuffer(); //VBO para as coordenadas
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.coordsVBO); // Ativar o buffer criado. Ele VBO ativo no momento atual
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.coords), this.gl.STATIC_DRAW);
-        this.gl.vertexAttribPointer(this.program.aVertexPosition, 3, this.gl.FLOAT, false, 0, 0);
-        this.gl.enableVertexAttribArray(this.program.aVertexPosition);
-
-        //Passo 3
-        this.colorsVBO = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorsVBO);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.colors), this.gl.STATIC_DRAW);
-        this.gl.vertexAttribPointer(this.program.aVertexColor, 3, this.gl.FLOAT, false, 0, 0);
-        this.gl.enableVertexAttribArray(this.program.aVertexColor);
-      
-        //Passo 4
-        this.IBO = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.IBO);
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), this.gl.STATIC_DRAW);
-
-
+    
+        if (this.coords && this.program.aVertexPosition !== -1) {
+            // Create coords VBO
+            this.coordsVBO = this.gl.createBuffer();
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.coordsVBO);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.coords), this.gl.STATIC_DRAW);
+            this.gl.vertexAttribPointer(this.program.aVertexPosition, 3, this.gl.FLOAT, false, 0, 0);
+            this.gl.enableVertexAttribArray(this.program.aVertexPosition);
+        }
+    
+        if (this.colors && this.program.aVertexColor !== -1) {
+            // Create colors VBO
+            this.colorsVBO = this.gl.createBuffer();
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorsVBO);
+            this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.colors), this.gl.STATIC_DRAW);
+            this.gl.vertexAttribPointer(this.program.aVertexColor, 3, this.gl.FLOAT, false, 0, 0);
+            this.gl.enableVertexAttribArray(this.program.aVertexColor);
+        }
+    
+        if (this.indices) {
+            // Create IBO
+            this.IBO = this.gl.createBuffer();
+            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.IBO);
+            this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), this.gl.STATIC_DRAW);
+        }
+    
         // Clean
         this.gl.bindVertexArray(null);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
-
-    }
+    }    
 
     /* Metodo auxiliar que inicializa os buffers e o program shader */
     set(attribShaderVariables,uniformShaderVariables){
@@ -127,30 +131,29 @@ class WebGLModel{
                ];
       }
 
-      setRotation(angle = 0, vertexes = [],xpos=0, ypos=0){
-        const uniformShaderVariablesValues = {
-          "uVertexPointSize":["1f",16.0],
-          "uModelViewMatrix":["mat4",false,this.rotationMatrix(angle,xpos,ypos)]
-        };
-
-        let x = 0, y = 0;
-        for (let i = 0; i < vertexes.length; i++){
-          x += vertexes[i].x;
-          y += vertexes[i].y;
-          // console.log("x: " + vertexes[i].x + ", y: "+vertexes[i].y );
+      setRotation(angle = 0, vertexes = [], xpos = 0, ypos = 0) {
+        if (!vertexes || vertexes.length === 0) {
+            console.warn('Vertexes array is null or empty');
+            return;
         }
-
-        // console.log("x: " + x + ", y: "+y );
-        x = x/vertexes.length;
-        y = y/vertexes.length;
-        // console.log("x: " + x + ", y: "+y );
-
+    
+        const uniformShaderVariablesValues = {
+            "uVertexPointSize": ["1f", 16.0],
+            "uModelViewMatrix": ["mat4", false, this.rotationMatrix(angle, xpos, ypos)]
+        };
+    
+        let x = 0, y = 0;
+        for (let i = 0; i < vertexes.length; i++) {
+            x += vertexes[i].x;
+            y += vertexes[i].y;
+        }
+    
+        x = x / vertexes.length;
+        y = y / vertexes.length;
+    
         this.setCenter(this.program, x, y);
-
-        this.setProgramUniformShaderVariablesValues(this.program,uniformShaderVariablesValues);
-      }
-
-
+        this.setProgramUniformShaderVariablesValues(this.program, uniformShaderVariablesValues);
+    }
 
 
 

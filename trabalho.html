@@ -1,7 +1,7 @@
 <html>
 <head>
   <title>Rendering primitives</title>
-  <!--<link rel="shortcut icon" type="image/png" href="../common/images/favicon.png" />-->
+  <!-- <link rel="shortcut icon" type="image/png" href="../common/images/favicon.png" /> -->
 
   <!-- libraries -->
   <!--<link rel="stylesheet" href="../common/lib/normalize.css">-->
@@ -17,8 +17,43 @@
   <script type="text/javascript" src="./shapes2d.js"></script>
   <script type="text/javascript" src="./shapes2dWebGL.js"></script>
   
-  
   <script id="vertex-shader" type="x-shader/x-vertex">
+    #version 300 es
+    precision mediump float;
+    
+    in vec3 aVertexPosition;
+    in vec3 aVertexColor;
+    uniform float uVertexPointSize;
+    uniform mat4 uModelViewMatrix;
+    uniform vec3 aShapeCenter;
+    smooth out vec4 vColor;
+    
+    void main(void) {
+      vec4 pos = vec4(aVertexPosition, 1.0);
+      vec4 center = vec4(aShapeCenter, 0.0);
+    
+      pos = pos - center;
+      pos = uModelViewMatrix * pos;
+      pos = pos + center;
+    
+      gl_PointSize = uVertexPointSize;
+      gl_Position = pos;
+      vColor = vec4(aVertexColor, 1.0);
+    }
+  </script>
+  
+  <script id="fragment-shader" type="x-shader/x-fragment">
+    #version 300 es
+    precision mediump float;
+    in vec4 vColor;
+    out vec4 fragColor;
+    
+    void main(void) {
+      fragColor = vColor;
+    }
+  </script>
+
+  <!-- <script id="vertex-shader" type="x-shader/x-vertex">
     #version 300 es
     precision mediump float;
 
@@ -43,10 +78,10 @@
       gl_Position = pos;
       vColor= vec4(aVertexColor,1.0);
     }
-  </script>
+  </script> -->
 
   <!-- fragment shader -->
-  <script id="fragment-shader" type="x-shader/x-fragment">
+  <!-- <script id="fragment-shader" type="x-shader/x-fragment">
     #version 300 es
     precision mediump float;
     in vec4 vColor;
@@ -55,9 +90,9 @@
     void main(void) {
       fragColor = vColor;
     }
-  </script>
+  </script> -->
 
-  <script type="text/javascript">
+  <!-- <script type="text/javascript">
   
     class MyWebGLMainAPP extends WebGLMainApp{
     
@@ -223,10 +258,7 @@
       }
    
   }
-
-
-  
-  </script>
+  </script> -->
 </head>
 
 <body>
@@ -235,10 +267,72 @@
     Your browser does not support the HTML5 canvas element.
   </canvas>
 
-  <script type="text/javascript">
+  <!-- <script type="text/javascript">
       let myWebGLMainAPP = new MyWebGLMainAPP();
       window.onload = myWebGLMainAPP.init();
-  </script>
+  </script> -->
+
+  <script type="text/javascript">
+    class MyWebGLMainAPP extends WebGLMainApp {
+      constructor() {
+        super();
+        this.program = null;
+        this.angel = null;
+        this.leftWing = null;
+        this.rightWing = null;
+    }
+
+    create() {
+        this.program = this.createProgram("vertex-shader", "fragment-shader");
+
+        this.attribShaderVariables = ["aVertexPosition", "aVertexColor"];
+        this.uniformShaderVariables = ["uVertexPointSize", "uModelViewMatrix"];
+
+        this.setProgramAttribShaderVariablesLocation(this.program, this.attribShaderVariables);
+        this.setProgramUniformShaderVariablesLocation(this.program, this.uniformShaderVariables);
+
+        const angel = new WebGLAngeling(this.gl, this.program);
+        this.angel = angel.getWebGLModel();
+
+        const leftWing = new WebGLAngelWing(this.gl, this.program, -0.6, 0);
+        const rightWing = new WebGLAngelWing(this.gl, this.program, 0.6, 0, true); // Mirrored wing
+        this.leftWing = leftWing.getWebGLModel();
+        this.rightWing = rightWing.getWebGLModel();
+    }
+
+    draw() {
+        const identMatrix4 = new Float32Array([
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        ]);
+        const uniformShaderVariablesValues = { 
+            "uVertexPointSize": ["1f", 16.0], 
+            "uModelViewMatrix": ["mat4", false, identMatrix4] 
+        };
+
+        this.setProgramUniformShaderVariablesValues(this.program, uniformShaderVariablesValues);
+
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
+        this.angel.forEach(shape => shape.draw());
+        this.leftWing.forEach(shape => shape.draw());
+        this.rightWing.forEach(shape => shape.draw());
+    }
+
+    init() {
+        this.gl.clearColor(0.7, 0.7, 0.9, 1.0);
+        super.init();
+    }
+}
+
+let myWebGLMainAPP = new MyWebGLMainAPP();
+window.onload = function() {
+    myWebGLMainAPP.init();
+};
+
+</script>
 
 </body>
 
