@@ -155,6 +155,11 @@ class WebGLModel {
         this.setProgramUniformShaderVariablesValues(this.program, uniformShaderVariablesValues);
     }
 
+    setAlpha(alpha) {
+        const alphaLocation = this.gl.getUniformLocation(this.program, "uAlpha");
+        this.gl.uniform1f(alphaLocation, alpha);
+    }
+
     /* Desenha o model */
     draw(angle = 0, x = 0, y = 0) {
 
