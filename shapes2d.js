@@ -91,6 +91,7 @@ class Circle extends Shape2d{
             coords[j] = p[0];
             coords[j+1] = p[1];
             coords[j+2] = 0.0;
+            this.vertexes.push(new Point2d(p[0], p[1], this.color));
 
             //colors[j] = 3*Math.random()/5;
             //colors[j+1] = 2*Math.random()/5;
@@ -163,6 +164,7 @@ class Elipse extends Shape2d{
             coords[j] = p[0];
             coords[j+1] = p[1];
             coords[j+2] = 0.0;
+            this.vertexes.push(new Point2d(p[0], p[1], this.color));
 
             //colors[j] = 3*Math.random()/5;
             //colors[j+1] = 2*Math.random()/5;

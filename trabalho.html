@@ -284,6 +284,8 @@
     }
 
     create() {
+        this.startTime = Date.now();
+
         this.program = this.createProgram("vertex-shader", "fragment-shader");
 
         this.attribShaderVariables = ["aVertexPosition", "aVertexColor"];
@@ -328,7 +330,7 @@
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-        this.angel.forEach(shape => shape.draw());
+        this.angel.forEach(shape => shape.draw(0, 0, Math.sin(elapsedTime)/4));
         this.leftWing.forEach(shape => shape.draw());
         this.rightWing.forEach(shape => shape.draw());
     }

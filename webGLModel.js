@@ -2,7 +2,7 @@
 /*A classe mantem uma referência para o contexto gl e para o program shader */
 
 class WebGLModel {
-    constructor(gl, program, dim, primitiveType, coords, indices, colors, normals, tangents, textureCoords, vertexes = null) {
+    constructor(gl, program, dim, primitiveType, coords, indices, colors, normals, tangents, textureCoords, vertexes = []) {
         this.gl = gl;
         this.program = program;
         this.vertexes = vertexes;

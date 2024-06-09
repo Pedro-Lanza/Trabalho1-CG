@@ -388,7 +388,9 @@ class WebGLCircle extends Circle {
             this.vertexes.push(new Point2d(x, y, this.color));
         }
 
-        const webGLCircleModel = new WebGLModel(this.gl, this.program, 2, primitiveType, coords, indices, colors, null, null, null, this.vertexes);
+        const webGLCircleModel = new WebGLModel(
+            this.gl, this.program, 2, primitiveType, coords, indices, colors, null, null, null, this.vertexes
+        );
         webGLCircleModel.set(attribShaderVariables, uniformShaderVariables);
 
         return webGLCircleModel;
@@ -423,7 +425,7 @@ class WebGLElipse extends Elipse{
         }
  
         const webGLElipseModel = new WebGLModel(
-            this.gl,this.program,2,primitiveType,coords,indices,colors,null,null,null
+            this.gl,this.program,2,primitiveType,coords,indices,colors,null,null,null, this.vertexes
         );
         webGLElipseModel.set(attribShaderVariables,uniformShaderVariables);
 
@@ -574,9 +576,14 @@ class WebGLArc extends Shape2d {
             coords.push(x, y, 0.0);
             colors.push(this.color.r, this.color.g, this.color.b);
             indices.push(i);
+            this.vertexes.push(new Point2d(x, y, this.color));
         }
 
-        this.model = new WebGLModel(this.gl, this.program, 3, this.gl.LINE_STRIP, coords, indices, colors);
+        console.log(this.vertexes);
+
+        this.model = new WebGLModel(
+            this.gl, this.program, 3, this.gl.LINE_STRIP, coords, indices, colors, this.vertexes
+        );
         this.model.initBuffers();
     }
 
