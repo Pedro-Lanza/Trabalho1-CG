@@ -1,0 +1,145 @@
+<html>
+<head>
+  <title>Rendering primitives</title>
+
+  <script type="text/javascript" src="./webGLApp.js"></script>
+  <script type="text/javascript" src="./webGLModel.js"></script>
+  <script type="text/javascript" src="./shapes2d.js"></script>
+  <script type="text/javascript" src="./shapes2dWebGL.js"></script>
+  
+  <script id="vertex-shader" type="x-shader/x-vertex">
+    #version 300 es
+    precision mediump float;
+    
+    in vec3 aVertexPosition;
+    in vec3 aVertexColor;
+    uniform float uVertexPointSize;
+    uniform mat4 uModelViewMatrix;
+    uniform vec3 aShapeCenter;
+    uniform float uTime;
+    smooth out vec4 vColor;
+    
+    void main(void) {
+        vec4 pos = vec4(aVertexPosition, 1.0);
+        vec4 center = vec4(aShapeCenter, 0.0);
+        
+        // Calculate the wing flap angle
+        float wingAngle = sin(uTime * 5.0) * 0.2; // Adjust the speed and range of the flapping as needed
+        mat4 wingRotation = mat4(
+            cos(wingAngle), -sin(wingAngle), 0.0, 0.0,
+            sin(wingAngle), cos(wingAngle), 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        );
+
+  
+        pos = pos - center;
+        pos = uModelViewMatrix * wingRotation * pos; // Apply the wing rotation
+        pos = pos + center;
+        
+        gl_PointSize = uVertexPointSize;
+        gl_Position = pos;
+        vColor = vec4(aVertexColor, 1.0);
+    }
+    
+  </script>
+  
+  <script id="fragment-shader" type="x-shader/x-fragment">
+    #version 300 es
+    precision mediump float;
+    in vec4 vColor;
+    out vec4 fragColor;
+    
+    void main(void) {
+      fragColor = vColor;
+    }
+  </script>
+
+</head>
+
+<body>
+
+  <canvas id="webgl-canvas" width="800" height="800">
+    Your browser does not support the HTML5 canvas element.
+  </canvas>
+
+  <script type="text/javascript">
+    class MyWebGLMainAPP extends WebGLMainApp {
+      constructor() {
+        super();
+        this.program = null;
+        this.angel = null;
+        this.leftWing = null;
+        this.rightWing = null;
+        this.startTime = null;
+    }
+
+    create() {
+      this.startTime = Date.now();
+  
+      this.program = this.createProgram("vertex-shader", "fragment-shader");
+  
+      this.attribShaderVariables = ["aVertexPosition", "aVertexColor"];
+      this.uniformShaderVariables = ["uVertexPointSize", "uModelViewMatrix", "uTime"];
+  
+      this.setProgramAttribShaderVariablesLocation(this.program, this.attribShaderVariables);
+      this.setProgramUniformShaderVariablesLocation(this.program, this.uniformShaderVariables);
+  
+      const angel = new WebGLAngeling(this.gl, this.program);
+      this.angel = angel.getWebGLModel();
+  
+      const leftWing = new WebGLAngelWing(this.gl, this.program, -0.6, 0);
+      const rightWing = new WebGLAngelWing(this.gl, this.program, 0.6, 0, true); // Mirrored wing
+      this.leftWing = leftWing.getWebGLModel();
+      this.rightWing = rightWing.getWebGLModel();
+  }
+  
+
+    draw() {
+      if (this.startTime === null) {
+          this.startTime = Date.now();
+      }
+  
+      const currentTime = Date.now();
+      const elapsedTime = (currentTime - this.startTime) / 1000.0;
+      const bounceHeight = 0.1;
+      const bounceSpeed = 2.0;
+      const offsetY = bounceHeight * Math.sin(bounceSpeed * elapsedTime);
+  
+      const translationMatrix = new Float32Array([
+          1.0, 0.0, 0.0, 0.0,
+          0.0, 1.0, 0.0, 0.0,
+          0.0, 0.0, 1.0, 0.0,
+          0.0, offsetY, 0.0, 1.0
+      ]);
+  
+      const uniformShaderVariablesValues = {
+          "uVertexPointSize": ["1f", 16.0],
+          "uModelViewMatrix": ["mat4", false, translationMatrix],
+          "uTime": ["1f", elapsedTime] // Pass the elapsed time to the shader
+      };
+  
+      this.setProgramUniformShaderVariablesValues(this.program, uniformShaderVariablesValues);
+  
+      this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+  
+      this.angel.forEach(shape => shape.draw(0, 0, Math.sin(elapsedTime)/4));
+      this.leftWing.forEach(shape => shape.draw(0, 0, Math.sin(elapsedTime)/4));
+      this.rightWing.forEach(shape => shape.draw(0, 0, Math.sin(elapsedTime)/4));
+  }
+  
+
+    init() {
+        this.gl.clearColor(0.7, 0.7, 0.9, 1.0);
+        super.init();
+    }
+}
+
+let myWebGLMainAPP = new MyWebGLMainAPP();
+window.onload = function() {
+    myWebGLMainAPP.init();
+};
+
+</script>
+
+</body>

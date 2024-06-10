@@ -618,22 +618,22 @@ class WebGLAngelWing {
         ];
 
         // Feathers
-        // const featherCircles = [
-        //     new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.3 : this.offsetX - 0.3, this.offsetY + 0.4, 0.05, c0, 32, true),
-        //     new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.3, 0.04, c0, 32, true),
-        //     new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.2, 0.03, c0, 32, true),
-        //     new WebGLCircle(this.gl, this.program, this.offsetX, this.offsetY, 0.02, c0, 32, true)
-        // ];
+        const featherCircles = [
+            new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.3 : this.offsetX - 0.3, this.offsetY + 0.4, 0.05, c0, 32, true),
+            new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.3, 0.04, c0, 32, true),
+            new WebGLCircle(this.gl, this.program, this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.2, 0.03, c0, 32, true),
+            new WebGLCircle(this.gl, this.program, this.offsetX, this.offsetY, 0.02, c0, 32, true)
+        ];
 
-        // // Connectors (lines)
-        // const connectors = [
-        //     new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.3 : this.offsetX - 0.3, this.offsetY + 0.4, c0), new Point2d(this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.5, c0), c0, false),
-        //     new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.3, c0), new Point2d(this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.4, c0), c0, false),
-        //     new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.2, c0), new Point2d(this.offsetX, this.offsetY + 0.3, c0), c0, false),
-        // ];
+        // Connectors (lines)
+        const connectors = [
+            new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.3 : this.offsetX - 0.3, this.offsetY + 0.4, c0), new Point2d(this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.5, c0), c0, false),
+            new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.2 : this.offsetX - 0.2, this.offsetY + 0.3, c0), new Point2d(this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.4, c0), c0, false),
+            new WebGLLine(this.gl, this.program, new Point2d(this.mirror ? this.offsetX + 0.1 : this.offsetX - 0.1, this.offsetY + 0.2, c0), new Point2d(this.offsetX, this.offsetY + 0.3, c0), c0, false),
+        ];
 
-        this.shapes.push(...mainEllipses);
-        // this.shapes.push(...mainEllipses, ...featherCircles, ...connectors);
+        // this.shapes.push(...mainEllipses);
+        this.shapes.push(...mainEllipses, ...featherCircles, ...connectors);
     }
 
     getWebGLModel() {
