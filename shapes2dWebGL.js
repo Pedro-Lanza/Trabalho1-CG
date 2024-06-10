@@ -530,7 +530,7 @@ class WebGLAngeling {
         this.shapes.push(leftEye, rightEye);
 
         // Halo (circle)
-        const halo = new WebGLCircle(this.gl, this.program, 0.0, 0.35, 0.2, haloColor, 32, false);
+        const halo = new WebGLCircle(this.gl, this.program, 0.0, 0.40, 0.2, haloColor, 32, false);
         this.shapes.push(halo);
 
         // Mouth (lower halves of two circles, smaller and higher)
