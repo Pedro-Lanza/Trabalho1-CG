@@ -429,6 +429,7 @@ class WebGLElipse extends Elipse{
         );
         webGLElipseModel.set(attribShaderVariables,uniformShaderVariables);
 
+
         return webGLElipseModel;
     }
 }
@@ -579,10 +580,8 @@ class WebGLArc extends Shape2d {
             this.vertexes.push(new Point2d(x, y, this.color));
         }
 
-        console.log(this.vertexes);
-
         this.model = new WebGLModel(
-            this.gl, this.program, 3, this.gl.LINE_STRIP, coords, indices, colors, this.vertexes
+            this.gl, this.program, 3, this.gl.LINE_STRIP, coords, indices, colors, null, null, null, this.vertexes
         );
         this.model.initBuffers();
     }
